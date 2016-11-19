@@ -1,26 +1,34 @@
 # sima
 
-Data I/O (such as Marshal serialization) for brain-deads.
+Easy to use multi-format serialization interface.
 
-## Goal
+## Usage
 
-I hate the dance for reading and dumping Marshal. Why it takes so long?
-
-```{ruby}
-## dumping
-File.open("output.mar", 'wb') { |f| f.write(Marshal.dump(obj)) }
-
-## reading
-obj = Marshal.load(File.read("output.mar"))
-```
-
-It takes even longer when the file name is a relative path. The goal of `Sima` is to make the above I/O process brain-dead compatible.
+File I/O
 
 ```{ruby}
-Sima.dump(obj, "~/output.mar")
-obj = Sima.load("~/output.mar")
+Sima.export(obj, "~/output.mar")
+obj = Sima.import("~/output.mar")
+
+### Sima can guess the file format you want to serialize/deserialize
+Sima.export({:testing => [2,3,4,5,6]}, "~/output.yml")
+Sima.import("~/output.yml")
+```
+dump / load
+
+```{ruby}
+Sima.load('[1,2,3,4]', 'json')
+Sima.dump({:testing => [2,3,4,5,6]}, 'mpac')
 ```
 
+## Supported serialization format
+
+| Format | Extension |
+| ------ | --------- |
+| Marshal | .mar .marshal |
+| JSON | .json |
+| MessagePack | .mpac .msg .msgpack |
+| YAML | .yml .yaml |
 
 ## Why this name, Sima?
 

@@ -4,42 +4,48 @@ require 'json'
 require 'msgpack'
 
 module Sima
-  def self.dump(obj, file_path, format = nil)
+  def self.dump(obj, format = 'mar')
+    case format
+    when 'mar', 'marshal'
+      Marshal.dump(obj)
+    when 'yaml', 'yml'
+      YAML.dump(obj)
+    when 'json'
+      JSON.dump(obj)
+    when 'mpac', 'msg', 'msgpac'
+      MessagePack.pack(obj)
+    else
+      raise ArgumentError, "Unknown serialization format."
+    end
+  end
+  def self.load(source, format = 'mar')
+    case format
+    when "mar", "marshal"
+      Marshal.load(source)
+    when "yaml", "yml"
+      YAML.load(source)
+    when 'json'
+      JSON.load(source)
+    when 'mpac', 'msg', 'msgpac'
+      MessagePack.unpack(source)
+    else
+      raise ArgumentError, "Unknown serialization format."
+    end
+  end
+  def self.export(obj, file_path, format = nil)
     if format.nil?
       format = guessformat(file_path)
     end
     File.open(File.expand_path(file_path), 'wb') do |f|
-      case format
-      when 'mar', 'marshal'
-        f.write(Marshal.dump(obj))
-      when 'yaml', 'yml'
-        f.write(YAML.dump(obj))
-      when 'json'
-        f.write(JSON.dump(obj))
-      when 'mpac', 'msg', 'msgpac'
-        f.write(MessagePack.pack(obj))
-      else
-        raise ArgumentError, "Unknown serialization format."
-      end
+      f.write(dump(obj, format))
     end
   end
-  def self.load(file_path, format = nil)
+  def self.import(file_path, format = nil)
     if format.nil?
       format = guessformat(file_path)
     end
     f = File.read(File.expand_path(file_path))
-    case format
-    when "mar", "marshal"
-      obj = Marshal.load(f)
-    when "yaml", "yml"
-      obj = YAML.load(f)
-    when 'json'
-      obj = JSON.load(f)
-    when 'mpac', 'msg', 'msgpac'
-      obj = MessagePack.unpack(f)
-    else
-      raise ArgumentError, "Unknown serialization format"
-    end
+    obj = load(f, format)
     return obj
   end
   def self.guessformat(file_path)
