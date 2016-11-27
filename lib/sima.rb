@@ -5,28 +5,28 @@ require 'msgpack'
 
 module Sima
   def self.dump(obj, format = 'mar')
-    case format
-    when 'mar', 'marshal'
+    case format.downcase
+    when 'mar', 'marshal', :mar, :marshal
       Marshal.dump(obj)
-    when 'yaml', 'yml'
+    when 'yaml', 'yml', :yaml, :yml
       YAML.dump(obj)
-    when 'json'
+    when 'json', :json
       JSON.dump(obj)
-    when 'mpac', 'msg', 'msgpac'
+    when 'mpac', 'msg', 'msgpac', :mpac, :msg, :msgpac
       MessagePack.pack(obj)
     else
       raise ArgumentError, "Unknown serialization format."
     end
   end
   def self.load(source, format = 'mar')
-    case format
-    when "mar", "marshal"
+    case format.downcase
+    when 'mar', 'marshal', :mar, :marshal
       Marshal.load(source)
-    when "yaml", "yml"
+    when 'yaml', 'yml', :yaml, :yml
       YAML.load(source)
-    when 'json'
+    when 'json', :json
       JSON.load(source)
-    when 'mpac', 'msg', 'msgpac'
+    when 'mpac', 'msg', 'msgpac', :mpac, :msg, :msgpac
       MessagePack.unpack(source)
     else
       raise ArgumentError, "Unknown serialization format."
